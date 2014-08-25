@@ -6,9 +6,9 @@ var url = require("url");
 var ws = require("ws");
 
 
-exports.port = 6636;
+exports.port = Number(process.env.SIMPLE_RELOADER_PORT) || 6636;
 
-exports.host = "localhost";
+exports.host = process.env.SIMPLE_RELOADER_HOST || "localhost";
 
 exports.Reloader = Reloader;
 
@@ -18,10 +18,10 @@ function Reloader(callback) {
     this.server = null;
     this.wss = null;
     this.revision = 1;
-    this.port = Number(process.env.SIMPLE_RELOADER_PORT) || exports.port;
-    this.host = process.env.SIMPLE_RELOADER_HOST || exports.host;
-    this.root = "http://" + exports.host + ":" + this.port;
-    this.clientURL = this.root + "/reloader.js";
+    this.port = exports.port;
+    this.host = exports.host;
+    this.root = "http://" + exports.host + ":" + exports.port;
+    this.clientURL = exports.root + "/reloader.js";
     this.clientSource = null;
 
     var server = http.createServer(function(req, res) {
@@ -61,7 +61,7 @@ Reloader.prototype.reload = function() {
 Reloader.prototype._initMasterReloader = function(server) {
     this.master = true;
     this.server = server;
-    var path = require.resolve("./script/reloader.js");
+    var path = require.resolve("../script/reloader.js");
     this.clientSource = fs.readFileSync(path).toString();
     this.wss = new ws.Server({ server: server, path: "/connect" });
 };
@@ -70,31 +70,35 @@ Reloader.prototype._requestHandler = function(req, res) {
     var urlinfo = url.parse(req.url);
     var pathname = urlinfo.pathname;
 
-    if(pathname === "/reloader.js") {
-        res.writeHead(200, { "Content-Type": "application/javascript" });
-        var src = this.clientSource;
-        src = src.replace("<HOST>", this.host);
-        src = src.replace("<PORT>", this.port);
-        src = src.replace("<REVISION>", String(this.revision));
-        res.end(src);
+    switch(pathname) {
+        case "/reloader.js":
+            res.writeHead(200, { "Content-Type": "application/javascript" });
+            var src = this.clientSource;
+            src = src.replace("<HOST>", this.host);
+            src = src.replace("<PORT>", this.port);
+            src = src.replace("<REVISION>", String(this.revision));
+            res.end(src);
+            return;
 
-    } else if(pathname === "/reload") {
-        res.writeHead(200, { "Access-Control-Allow-Origin": "*" });
-        res.end("simple-reloader.js\nreload");
-        this.reload();
+        case "/reload":
+            res.writeHead(200, { "Access-Control-Allow-Origin": "*" });
+            res.end("simple-reloader.js\nreload");
+            this.reload();
+            return;
 
-    } else if(pathname === "/polling") {
-        var query = querystring.parse(urlinfo.query);
-        var rev = Number(query.revision);
-        console.log(rev, this.revision);
-        res.writeHead(200, {
-            "Access-Control-Allow-Origin": "*",
-            "Cache-Control": "no-cache",
-        });
-        res.end(rev < this.revision ? "reload_browser" : String(this.revision));
+        case "/polling":
+            var query = querystring.parse(urlinfo.query);
+            var rev = Number(query.revision);
+            console.log(rev, this.revision);
+            res.writeHead(200, {
+                "Access-Control-Allow-Origin": "*",
+                "Cache-Control": "no-cache",
+            });
+            res.end(rev < this.revision ? "reload_browser" : String(this.revision));
+            return;
 
-    } else {
-        res.writeHead(404);
-        res.end("simple-reloader.js\n404 NotFound");
+        default:
+            res.writeHead(404);
+            res.end("simple-reloader.js\n404 NotFound");
     }
 };
