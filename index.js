@@ -4,6 +4,7 @@ var fs = require("fs");
 var querystring = require("querystring");
 var url = require("url");
 var ws = require("ws");
+var webserver = require("./webserver.js");
 
 
 exports.port = Number(process.env.F52_PORT) || 6636;
@@ -11,6 +12,8 @@ exports.port = Number(process.env.F52_PORT) || 6636;
 exports.host = process.env.F52_HOST || "localhost";
 
 exports.Reloader = Reloader;
+
+exports.createWebServer = webserver.createWebServer;
 
 /**
  * Reloader
@@ -25,7 +28,7 @@ function Reloader(callback) {
     this.port = exports.port;
     this.host = exports.host;
     this.root = "http://" + exports.host + ":" + exports.port;
-    this.clientURL = exports.root + "/reloader.js";
+    this.clientURL = this.root + "/reloader.js";
     this.clientSource = null;
 
     this.server = http.createServer(function(req, res) {
@@ -73,7 +76,7 @@ Reloader.prototype.reload = function() {
 
 Reloader.prototype._initMasterReloader = function() {
     this.master = true;
-    var path = require.resolve("../script/reloader.js");
+    var path = require.resolve("./script/reloader.js");
     this.clientSource = fs.readFileSync(path).toString();
     this.wss = new ws.Server({ server: this.server, path: "/connect" });
 };
