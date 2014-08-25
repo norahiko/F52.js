@@ -1,0 +1,27 @@
+{
+  "name": "simple-reloader",
+  "version": "0.0.0",
+  "description": "Webbrowser reloader",
+  "main": "index.js",
+  "dependencies": {
+    "ws": "^0.4.32"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/norahiko/simple-reloader"
+  },
+  "keywords": [
+    "reload",
+    "webserver"
+  ],
+  "author": "norahiko",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/norahiko/simple-reloader/issues"
+  },
+  "homepage": "https://github.com/norahiko/simple-reloader"
+}
