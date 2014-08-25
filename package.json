@@ -1,5 +1,5 @@
 {
-  "name": "simple-reloader",
+  "name": "F52",
   "version": "0.0.0",
   "description": "Webbrowser reloader",
   "main": "index.js",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/norahiko/simple-reloader"
+    "url": "https://github.com/norahiko/F52.js"
   },
   "keywords": [
     "reload",
@@ -21,7 +21,7 @@
   "author": "norahiko",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/norahiko/simple-reloader/issues"
+    "url": "https://github.com/norahiko/F52.js/issues"
   },
-  "homepage": "https://github.com/norahiko/simple-reloader"
+  "homepage": "https://github.com/norahiko/F52.js"
 }

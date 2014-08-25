@@ -6,11 +6,15 @@ var url = require("url");
 var ws = require("ws");
 
 
-exports.port = Number(process.env.SIMPLE_RELOADER_PORT) || 6636;
+exports.port = Number(process.env.F52_PORT) || 6636;
 
-exports.host = process.env.SIMPLE_RELOADER_HOST || "localhost";
+exports.host = process.env.F52_HOST || "localhost";
 
 exports.Reloader = Reloader;
+
+/**
+ * Reloader
+ */
 
 function Reloader(callback) {
     var reloader = this;
@@ -24,30 +28,39 @@ function Reloader(callback) {
     this.clientURL = exports.root + "/reloader.js";
     this.clientSource = null;
 
-    var server = http.createServer(function(req, res) {
+    this.server = http.createServer(function(req, res) {
         reloader._requestHandler(req, res);
     });
 
-    server.on("error", function (err) {
-        console.log(err);
-        callback && callback(null);
+    this.server.on("error", function (err) {
+        if(this.master) {
+            console.error(err);
+        } else {
+            callback && callback(null);
+            reloader.server = null;
+        }
     });
 
-    server.listen(this.port, function() {
-        reloader._initMasterReloader(server);
+    this.server.listen(this.port, function() {
+        reloader._initMasterReloader();
         callback && callback(null);
+        callback = null;
     });
 }
 
 
 Reloader.prototype.close = function(callback) {
-    this.master && this.server.close(callback);
+    if(this.master) {
+        this.server.close(callback);
+    } else {
+        setTimeout(callback, 0);
+    }
 };
 
 Reloader.prototype.reload = function() {
     if(this.master === false) {
         http.get(this.root + "/reload").on("error", function() {
-            console.error("(simple-reloader) Could not find master server. Please restart me.");
+            console.error("(F52.js) Could not find master server. Please restart me.");
         });
     } else if(this.wss) {
         this.revision += 1;
@@ -58,12 +71,11 @@ Reloader.prototype.reload = function() {
     }
 };
 
-Reloader.prototype._initMasterReloader = function(server) {
+Reloader.prototype._initMasterReloader = function() {
     this.master = true;
-    this.server = server;
     var path = require.resolve("../script/reloader.js");
     this.clientSource = fs.readFileSync(path).toString();
-    this.wss = new ws.Server({ server: server, path: "/connect" });
+    this.wss = new ws.Server({ server: this.server, path: "/connect" });
 };
 
 Reloader.prototype._requestHandler = function(req, res) {
@@ -82,7 +94,7 @@ Reloader.prototype._requestHandler = function(req, res) {
 
         case "/reload":
             res.writeHead(200, { "Access-Control-Allow-Origin": "*" });
-            res.end("simple-reloader.js\nreload");
+            res.end("F52.js\nreload");
             this.reload();
             return;
 
@@ -99,6 +111,6 @@ Reloader.prototype._requestHandler = function(req, res) {
 
         default:
             res.writeHead(404);
-            res.end("simple-reloader.js\n404 NotFound");
+            res.end("F52.js\n404 NotFound");
     }
 };
