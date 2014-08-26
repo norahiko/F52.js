@@ -76,7 +76,7 @@ Reloader.prototype.reload = function() {
 
 Reloader.prototype._initMasterReloader = function() {
     this.master = true;
-    var path = require.resolve("./script/reloader.js");
+    var path = require.resolve("./client/reloader.js");
     this.clientSource = fs.readFileSync(path).toString();
     this.wss = new ws.Server({ server: this.server, path: "/connect" });
 };
