@@ -1,14 +1,16 @@
 /**
- * Simple Reloader
+ * f52
+ * http://github.com/norahiko/f52
+ *
+ * copyright norahiko
  * MIT License
- * http://github.com/norahiko/simple-reloader
  */
 "use strict";
 (function() {
 
-var port = Number("<PORT>");
+var port = "<PORT>";
 var host = "<HOST>";
-var revision = Number("<REVISION>");
+var version = "<VERSION>";
 var ws = null;
 var retryMax = 50;
 var trying = 1;
@@ -25,7 +27,7 @@ if(window.WebSocket) {
 
 function tryConnect() {
     if(retryMax < trying) { return; }
-    console.log("simple-reloader", "Trying connect to", webSocketURL, trying + "/" + retryMax);
+    console.log("f52", "Trying connect to", webSocketURL, trying + "/" + retryMax);
     ws = new WebSocket(webSocketURL);
     ws.onopen = onOpenWebSocket;
     ws.onclose = onCloseWebSocket;
@@ -37,7 +39,7 @@ function tryConnect() {
 
 function onOpenWebSocket() {
     trying = 1;
-    console.log("simple-reloader", "Connect to", webSocketURL);
+    console.log("f52", "Connect to", webSocketURL);
 }
 
 function onErrorWebSocket(err) {
@@ -62,7 +64,7 @@ function startPolling() {
 }
 
 function polling() {
-    var url = pollingURL + "?revision=" + String(revision);
+    var url = pollingURL + "?version=" + version;
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.onload = onLoadPolling;
@@ -77,7 +79,6 @@ function onLoadPolling() {
         location.reload();
     } else {
         trying = 0;
-        revision = Number(msg) || 1;
         startPolling();
     }
 }

@@ -27,11 +27,17 @@ function createWebServer(options) {
 
     searchEmptyPort(options.port, 50, function(err, port) {
         if(err) {
-            options.callback(err);
+            server.emit("error", err);
         } else {
-            server.listen(port, options.host, options.callback);
+            server.listen(port, options.host);
         }
     });
+
+    server.close = function(callback) {
+        server.reloader.close(function() {
+            http.Server.prototype.close.call(server, callback);
+        });
+    };
 
     return server;
 }
@@ -87,7 +93,7 @@ RequestHandler.prototype.serveFile = function () {
         if(html.indexOf("<head>") === -1) {
             html += scriptTag;
         } else {
-            html = html.replace("<head>", "<head>\n	" + scriptTag);
+            html = html.replace("<head>", "<head>\n	" + scriptTag + "\n");
         }
         this.res.end(html);
     } else {
@@ -145,7 +151,7 @@ RequestHandler.prototype.serveListDirectory = function () {
 
     this.res.writeHead(200, {"Content-Type": "text/html", });
     this.res.write("<!DOCTYPE html><html><body>\n");
-    this.res.write('<script src="' + this.reloaderClientURL + '"></script>');
+    this.res.write('<script src="' + this.reloaderClientURL + '"></script>\n');
     this.res.write("<h1>" + decodeURIComponent(this.requested) + "</h1>\n");
     this.res.write(body.join(""));
     this.res.end("\n</body></html>");
