@@ -7,7 +7,6 @@
  */
 "use strict";
 (function() {
-
 var port = "<PORT>";
 var host = "<HOST>";
 var version = "<VERSION>";

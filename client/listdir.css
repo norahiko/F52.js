@@ -1,0 +1,49 @@
+body {
+    margin: 0px;
+}
+
+.breadcrumb {
+    position: fixed;
+    width: 100%;
+    padding: 5px 20px;
+    background: #003d19;
+    color: #7ab793;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 2px 0px 10px black;
+}
+
+.breadcrumb a {
+    display: inline-block;
+    color: #cfecdb;
+    padding: 10px 10px;
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.listdir {
+    padding: 50px 0px 0px 30px;
+
+}
+
+.listdir li {
+    list-style: none;
+    color: #0f5c2e;
+}
+
+.listdir a {
+    display: inline-block;
+    padding: 7px 200px 7px 10px;
+    font-size: 15px;
+    color: #0f5c2e;
+    text-decoration: none;
+}
+
+.listdir a:hover {
+
+    text-decoration: underline;
+}
+
